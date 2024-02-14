@@ -1,33 +1,38 @@
-import React from 'react'
-import {io} from 'socket.io-client'  
+import { useContext, useEffect } from 'react';
+import DataContext from '../../dataContext/DataContext';
+
+
 
 export default function Outgoing() {
-    const socket = io();
+  const { message, setMessage, socket } = useContext(DataContext);
 
-    socket.on("connect", () => {
-        console.log(socket.connected); 
-      });
-      
- const handleSend = () => {
-    socket.emit("message", message);
- }     
+  useEffect(() => {
+    socket.on('newmessage', (data) => {
+      console.log(data); // או בכל פעם שנתקבלת הודעה חדשה, תעשה משהו אחר
+    });
+  
+    return () => {
+      // Cleanup function to remove the event listener when the component unmounts
+      socket.off('newmessage');
+    };
+  }, []);
 
+  socket.emit('aviad', "nv bang?");
 
-   socket.on("message", (message) => {
-        console.log(message);
-      });
+  const handleSend = (e) => {
+    e.preventDefault();
+    const newMessage = e.target.message.value;
+    socket.emit('message', newMessage);
+  
+  };
 
   return (
-    <>
-    
-        <title>Socket.IO chat</title>
-    <h1></h1>
-    
-        <ul id="messages"></ul>
-        <form id="form" action="" onSubmit={handleSend}>
-          <input id="input" autoComplete="off" /><button>Send</button>
-        </form>
-  
-    </>
-  )
+    <div>
+      <ul id="messages"></ul>
+      <form onSubmit={handleSend}>
+        <input type='text' name='message' id='message' />
+        <button type='submit'>Send</button>
+      </form>
+    </div>
+  );
 }

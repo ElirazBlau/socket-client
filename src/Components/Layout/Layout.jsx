@@ -6,7 +6,7 @@ import Login from '../Login/Login'
 export default function Layout() {
   return (
     <div>
-        <Login/>
+        {/* <Login/> */}
         <Content/>
         </div>
   )
